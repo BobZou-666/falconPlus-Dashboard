@@ -1,9 +1,8 @@
 import { Button, Tag, Col, Divider, Input, Row, Table, Typography, Popconfirm, Tabs, Badge, Select } from 'antd';
-import {DeleteOutlined, SearchOutlined, MinusOutlined} from "@ant-design/icons";
+import {DeleteOutlined, SearchOutlined} from "@ant-design/icons";
 import React, {useState, useEffect} from "react";
 import moment from 'moment';
 import IconFont from '@/components/IconFont';
-
 
 const { Text } = Typography;
 const { TabPane } = Tabs;
