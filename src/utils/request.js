@@ -53,4 +53,23 @@ const request = extend({
   // 默认错误处理
   credentials: 'include', // 默认请求是否带上cookie
 });
+
+request.interceptors.request.use(async (url, options) => {
+  // let apiToken = getAuthority();
+  // if (typeof apiToken !== 'string') {
+  //   apiToken = JSON.stringify(apiToken)
+  // }
+
+  const headers = {
+    'Content-Type': 'application/json',
+    Apitoken: '{"sig": "default-token-used-in-server-side","name":"API","admin": true}',
+  };
+  return (
+    {
+      url,
+      options: { ...options, headers },
+    }
+  );
+});
+
 export default request;
