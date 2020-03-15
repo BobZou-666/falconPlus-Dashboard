@@ -9,3 +9,15 @@ export async function queryEventCases() {
     },
   });
 }
+
+export async function queryEventCaseById(eventCaseId) {
+  return request(`/api/v1/alarm/eventcases?event_id=${eventCaseId}`, {
+    method: 'GET',
+  });
+}
+
+export async function queryEventsById(eventCaseId) {
+  return request(`/api/v1/alarm/events?event_id=${eventCaseId}`, {
+    method: 'GET',
+  });
+}

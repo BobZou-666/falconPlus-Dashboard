@@ -1,4 +1,4 @@
-import { queryEventCases } from '@/pages/Alarm/service';
+import { queryEventCases, queryEventCaseById, queryEventsById } from '@/pages/Alarm/service';
 import { notification } from 'antd';
 
 export default {
@@ -6,6 +6,8 @@ export default {
 
   state: {
     EventCases: [],
+    EventCaseDetail: {},
+    Events: [],
   },
 
   effects: {
@@ -16,6 +18,28 @@ export default {
         payload: response,
       })
     },
+    *queryEventCaseById({payload, callback}, { call, put }) {
+      const response = yield call(queryEventCaseById, payload);
+      yield put({
+        type: '_queryEventCaseById',
+        payload: response,
+      });
+
+      if (callback){
+        callback()
+      }
+    },
+    *queryEventsById({payload, callback}, { call, put }) {
+      const response = yield call(queryEventsById, payload);
+      yield put({
+        type: '_queryEventsById',
+        payload: response,
+      });
+
+      if (callback){
+        callback()
+      }
+    },
   },
 
   reducers: {
@@ -25,5 +49,21 @@ export default {
         EventCases: action.payload,
       };
     },
+    _queryEventCaseById(state, action){
+      let eventCaseDetail = [];
+      if (action.payload.length === 1){
+        eventCaseDetail= action.payload[0]
+      }
+      return {
+        ...state,
+        EventCaseDetail: eventCaseDetail,
+      };
+    },
+    _queryEventsById(state, action){
+      return {
+        ...state,
+        Events: action.payload,
+      };
+    }
   },
 }

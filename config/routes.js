@@ -56,7 +56,10 @@ export default [
           {
             path: '/alarm',
             name: 'alarm',
-            component: './Alarm',
+            routes:[
+              {path: '/alarm', component: './Alarm'},
+              {path: '/alarm/:caseId', component: './Alarm/Detail'},
+            ],
           },
           {
             component: './404',

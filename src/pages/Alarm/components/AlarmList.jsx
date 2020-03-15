@@ -1,4 +1,18 @@
-import { Button, Tag, Col, Divider, Input, Row, Table, Typography, Popconfirm, Tabs, Badge, Select } from 'antd';
+import {
+  Button,
+  Tag,
+  Col,
+  Divider,
+  Input,
+  Row,
+  Table,
+  Typography,
+  Popconfirm,
+  Tabs,
+  Badge,
+  Select,
+  message,
+} from 'antd';
 import {DeleteOutlined, SearchOutlined} from "@ant-design/icons";
 import React, {useState, useEffect} from "react";
 import moment from 'moment';
@@ -10,7 +24,7 @@ const { TabPane } = Tabs;
 let interval = undefined;
 
 const AlarmTabs = ({alarms, loading, refresh}) =>{
-  const [refreshInterval, setRefreshInterval] = useState(10);
+  const [refreshInterval, setRefreshInterval] = useState(30);
   if (!interval){
     interval = setInterval(() => {
       refresh()
@@ -64,6 +78,7 @@ const AlarmTabs = ({alarms, loading, refresh}) =>{
           >
             <Select.Option value="10">10秒</Select.Option>
             <Select.Option value="20">20秒</Select.Option>
+            <Select.Option value="30">30秒</Select.Option>
             <Select.Option value="60">1分钟</Select.Option>
             <Select.Option value="120">2分钟</Select.Option>
             <Select.Option value="300">5分钟</Select.Option>
@@ -258,9 +273,22 @@ const AlarmList = ({ alarms, loading }) => {
 
   let FilterSearchHosts = [];
   if (searchText && searchText !== ''){
-    alarms.forEach(v => {
-      if (v.endpoint.indexOf(searchText) !== -1){
-        FilterSearchHosts.push(v)
+    let searchTexts = searchText.toLowerCase().split(' ');
+
+    alarms.forEach(alarm => {
+      let find = true;
+      searchTexts.every(text=>{
+        if (alarm.endpoint.toLowerCase().indexOf(text) === -1 &&
+          alarm.metric.toLowerCase().indexOf(text) === -1 &&
+          alarm.note.toLowerCase().indexOf(text) === -1){
+          find = false;
+          return false
+        }
+        return true
+      });
+
+      if (find){
+        FilterSearchHosts.push(alarm)
       }
     });
   } else {
@@ -329,7 +357,7 @@ const AlarmList = ({ alarms, loading }) => {
           <span>
             <Text strong>{record.func}</Text>
             <span> </span>
-            ({leftValue} <Text strong type="warning">{op}</Text> {rightValue})
+            ({leftValue} <Text strong style={{color:"#ea9b1f"}}>{op}</Text> {rightValue})
           </span>
         )
       }
@@ -338,7 +366,7 @@ const AlarmList = ({ alarms, loading }) => {
       title: '告警次数',
       dataIndex: 'current_step',
       render: (text, record) =>
-        <span>第<Text strong type="warning">{text}</Text>次/最大<Text strong type="warning">{record.step}</Text>次</span>,
+        <span>第<Text strong style={{color:"#d18b1f"}}> {text} </Text>次/最大<Text strong style={{color:"#d18b1f"}}> {record.step} </Text>次</span>,
     },
     {
       title: '触发时间',
@@ -356,10 +384,10 @@ const AlarmList = ({ alarms, loading }) => {
       render: (text, record) => {
         return (
           <span>
-            <a>详情</a>
+            <a href={`/alarm/${record.id}`}>详情</a>
             <Divider type="vertical"/>
             <Popconfirm
-              title="确定删除吗?"
+              title={<span><Text type="danger">确定删除吗?</Text><br/><Text type="warning">因为后端没有相关接口所以删除不了</Text></span>}
               onConfirm={()=>{}}
               onCancel={() => message.info('您取消了操作')}
               okText="删除"
@@ -383,8 +411,10 @@ const AlarmList = ({ alarms, loading }) => {
               onClick={()=>{
                 setDeleteLoading(true);
                 setTimeout(()=>{
+                  setSelectedRowKeys([]);
                   setDeleteLoading(false);
-                }, 2000)
+                  message.warning("因为后端没有相关接口所以删除不了")
+                }, 1000)
               }}
               icon={<DeleteOutlined />}
               disabled={!hasSelected}
