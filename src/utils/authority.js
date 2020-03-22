@@ -2,7 +2,7 @@ import { reloadAuthorized } from './Authorized'; // use localStorage to store th
 
 export function getAuthority(str) {
   const authorityString =
-    typeof str === 'undefined' && localStorage ? localStorage.getItem('antd-pro-authority') : str; // authorityString could be admin, "admin", ["admin"]
+    typeof str === 'undefined' && localStorage ? localStorage.getItem('authority') : str; // authorityString could be admin, "admin", ["admin"]
 
   let authority;
 
@@ -16,18 +16,34 @@ export function getAuthority(str) {
 
   if (typeof authority === 'string') {
     return [authority];
-  } // preview.pro.ant.design only do not use in your production.
-  // preview.pro.ant.design 专用环境变量，请不要在你的项目中使用它。
-
-  if (!authority && ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION === 'site') {
-    return ['admin'];
   }
 
   return authority;
 }
+
+export function getAPIToken() {
+  return localStorage ? localStorage.getItem('apiToken') : null;
+}
+
+export function getCurrentUser() {
+  const currentUser =  localStorage ? localStorage.getItem('currentUser') : null;
+  if (currentUser !== null){
+    return JSON.parse(currentUser);
+  }
+  return {}
+}
+
+export function setCurrentUser(user) {
+  localStorage.setItem('currentUser', JSON.stringify(user)); // auto reload
+}
+
+export function setApiToken(apiToken) {
+  localStorage.setItem('apiToken', JSON.stringify(apiToken)); // auto reload
+}
+
 export function setAuthority(authority) {
   const proAuthority = typeof authority === 'string' ? [authority] : authority;
-  localStorage.setItem('antd-pro-authority', JSON.stringify(proAuthority)); // auto reload
+  localStorage.setItem('authority', JSON.stringify(proAuthority)); // auto reload
 
   reloadAuthorized();
 }

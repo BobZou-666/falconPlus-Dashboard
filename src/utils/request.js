@@ -4,6 +4,7 @@
  */
 import { extend } from 'umi-request';
 import { notification } from 'antd';
+import { getAPIToken, getAPiToken } from '@/utils/authority';
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
   201: '新建或修改数据成功。',
@@ -55,14 +56,11 @@ const request = extend({
 });
 
 request.interceptors.request.use(async (url, options) => {
-  // let apiToken = getAuthority();
-  // if (typeof apiToken !== 'string') {
-  //   apiToken = JSON.stringify(apiToken)
-  // }
+  let apiToken = getAPIToken();
 
   const headers = {
     'Content-Type': 'application/json',
-    Apitoken: '{"sig": "default-token-used-in-server-side","name":"API","admin": true}',
+    Apitoken: apiToken,
   };
   return (
     {

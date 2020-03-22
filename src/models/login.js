@@ -1,7 +1,7 @@
 import { stringify } from 'querystring';
 import { router } from 'umi';
-import { fakeAccountLogin } from '@/services/login';
-import { setAuthority } from '@/utils/authority';
+import { fakeAccountLogin, AccountLogin } from '@/services/login';
+import { setAuthority, setApiToken } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 const Model = {
   namespace: 'login',
@@ -10,13 +10,13 @@ const Model = {
   },
   effects: {
     *login({ payload }, { call, put }) {
-      const response = yield call(fakeAccountLogin, payload);
+      const response = yield call(AccountLogin, payload);
       yield put({
         type: 'changeLoginStatus',
         payload: response,
       }); // Login successfully
 
-      if (response.status === 'ok') {
+      if (response.name !== undefined && response.sig !== undefined) {
         const urlParams = new URL(window.location.href);
         const params = getPageQuery();
         let { redirect } = params;
@@ -30,6 +30,7 @@ const Model = {
             if (redirect.match(/^\/.*#/)) {
               redirect = redirect.substr(redirect.indexOf('#') + 1);
             }
+            window.location.href = '/';
           } else {
             window.location.href = '/';
             return;
@@ -55,8 +56,14 @@ const Model = {
   },
   reducers: {
     changeLoginStatus(state, { payload }) {
-      setAuthority(payload.currentAuthority);
-      return { ...state, status: payload.status, type: payload.type };
+      setApiToken(payload);
+      if (payload.admin){
+        setAuthority("admin");
+      } else {
+        setAuthority("user");
+      }
+
+      return { ...state};
     },
   },
 };

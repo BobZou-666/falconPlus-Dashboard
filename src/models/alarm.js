@@ -1,5 +1,4 @@
 import { queryEventCases, queryEventCaseById, queryEventsById } from '@/pages/Alarm/service';
-import { notification } from 'antd';
 
 export default {
   namespace: 'alarm',

@@ -5,6 +5,14 @@ export async function fakeAccountLogin(params) {
     data: params,
   });
 }
+
+export async function AccountLogin(params) {
+  return request('/api/v1/user/login', {
+    method: 'POST',
+    data: params,
+  });
+}
+
 export async function getFakeCaptcha(mobile) {
   return request(`/api/login/captcha?mobile=${mobile}`);
 }
