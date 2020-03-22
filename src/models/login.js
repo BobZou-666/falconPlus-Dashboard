@@ -30,7 +30,6 @@ const Model = {
             if (redirect.match(/^\/.*#/)) {
               redirect = redirect.substr(redirect.indexOf('#') + 1);
             }
-            window.location.href = '/';
           } else {
             window.location.href = '/';
             return;
@@ -38,6 +37,7 @@ const Model = {
         }
 
         router.replace(redirect || '/');
+        router.go()
       }
     },
 
@@ -51,6 +51,7 @@ const Model = {
             redirect: window.location.href,
           }),
         });
+        router.go()
       }
     },
   },
