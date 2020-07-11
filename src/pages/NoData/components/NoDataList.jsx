@@ -51,6 +51,22 @@ const NodataList = ({nodatas, loading}) => {
     return <Tag color="gray">其他</Tag>
   };
 
+  const renderObj = obj =>{
+    if (obj){
+      const objs = obj.split(",")
+      return (
+        <span>
+          {
+            objs.map((v, i)=>{
+              return <Tag color="green" key={i}>{v}</Tag>
+            })
+          }
+        </span>
+      )
+    }
+    return <span></span>
+  };
+
   const columns = [
     {
       title: '名称',
@@ -65,16 +81,25 @@ const NodataList = ({nodatas, loading}) => {
       render: text => renderObjType(text)
     },
     {
+      title: '对象',
+      dataIndex: 'obj',
+      render: text => renderObj(text)
+    },
+    {
       title: '指标',
       dataIndex: 'metric',
       render: (text, record) => {
-        return <span><Text strong>{text}</Text>/<Text strong style={{color:"green"}}>{record.tags}</Text></span>
+        if (record.tags) {
+          return <span><Text strong>{text}</Text>/<Text strong style={{color:"green"}}>{record.tags}</Text></span>
+        }
+        return <span><Text strong>{text}</Text></span>
       }
     },
-    {
-      title: '对象类型',
-      dataIndex: 'dstype',
-    },
+    // 因为现在只有GAUGE的数据类型，所有就不展示了
+    // {
+    //   title: '数据类型',
+    //   dataIndex: 'dstype',
+    // },
     {
       title: '间隔',
       dataIndex: 'step',
@@ -90,13 +115,11 @@ const NodataList = ({nodatas, loading}) => {
       render: (text, record)=>{
         return (
           <span>
-            <a href="#">对象列表</a>
+            <Button type="primary" size="small" href="#">修改</Button>
             <Divider type={'vertical'}/>
-            <a href="#">修改</a>
+            <Button type="primary" size="small" href="#">克隆</Button>
             <Divider type={'vertical'}/>
-            <a href="#">克隆</a>
-            <Divider type={'vertical'}/>
-            <a href="#">删除</a>
+            <Button type="primary" danger size="small" href="#">删除</Button>
           </span>
         )
       }

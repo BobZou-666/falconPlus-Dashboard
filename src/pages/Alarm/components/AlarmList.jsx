@@ -384,7 +384,7 @@ const AlarmList = ({ alarms, loading }) => {
       render: (text, record) => {
         return (
           <span>
-            <a href={`/alarm/${record.id}`}>详情</a>
+            <Button type="primary" size="small" href={`/alarm/${record.id}`}>详情</Button>
             <Divider type="vertical"/>
             <Popconfirm
               title={<span><Text type="danger">确定删除吗?</Text><br/><Text type="warning">因为后端没有相关接口所以删除不了</Text></span>}
@@ -393,8 +393,8 @@ const AlarmList = ({ alarms, loading }) => {
               okText="删除"
               cancelText="取消"
             >
-                <a style={{color:"#FF0000"}}>删除</a>
-              </Popconfirm>
+              <Button type="primary" danger size="small">删除</Button>
+            </Popconfirm>
           </span>
         )
       }
