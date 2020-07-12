@@ -25,8 +25,7 @@ class AlarmDetail extends React.Component {
     dispatch({
       type: 'alarm/queryEventCaseById',
       payload: caseId,
-    }).then(()=>{
-      this.setState({loading:false});
+      callback: ()=>{this.setState({loading:false})}
     });
   };
 
@@ -38,8 +37,7 @@ class AlarmDetail extends React.Component {
     dispatch({
       type: 'alarm/queryEventsById',
       payload: caseId,
-    }).then(()=>{
-      this.setState({loading:false});
+      callback: ()=>{this.setState({loading:false})}
     });
   };
 

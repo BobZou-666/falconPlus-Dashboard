@@ -1,13 +1,48 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Button, Col, Input, message, Row, Table, Typography, Checkbox, Tag, Divider } from 'antd';
-import { DeleteOutlined, SearchOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { deleteNodata, createNodata, updateNodata } from '@/pages/NoData/service';
+import UpdateForm from '@/pages/NoData/components/UpdateForm';
+import CreateForm from '@/pages/NoData/components/CreateForm';
 
 const { Text } = Typography;
 
+const handleUpdate = async (fields) => {
+  const hide = message.loading('正在更新');
+  try {
+    await updateNodata(fields);
+    hide();
+    message.success('更新成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error(`更新失败, 请重试：${error.toString()}`);
+    return false;
+  }
+};
 
-const NodataList = ({nodatas, loading}) => {
+const handleCreate = async payload =>{
+  const hide = message.loading(`正在创建 ${payload.name}`);
+  try {
+    await createNodata(payload);
+    hide();
+    message.success('创建成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error(`创建失败，请重试：${error.toString()}`);
+    return false;
+  }
+}
+
+const NodataList = ({nodatas, loading, refresh}) => {
   const [mine, setMine] = useState(true);
   const [searchText, setSearchText] = useState(undefined);
+  const [updateModalVisible, handleUpdateModalVisible] = useState(false);
+  const [cloneModalVisible, handleCloneModalVisible] = useState(false);
+  const [createModalVisible, handleCreateModalVisible] = useState(false);
+  const [formValues, setFormValues] = useState({});
+  const [cloneFormValues, setCloneFormValues] = useState({});
 
   let userNodatas = [];
   if (mine) {
@@ -67,6 +102,20 @@ const NodataList = ({nodatas, loading}) => {
     return <span></span>
   };
 
+  const handleDeleteNodata = async record => {
+    const hide = message.loading(`正在删除 ${record.name}`);
+    try {
+      await deleteNodata(record.id);
+      hide();
+      message.success('删除成功');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('删除失败，请重试');
+      return false;
+    }
+  }
+
   const columns = [
     {
       title: '名称',
@@ -115,11 +164,23 @@ const NodataList = ({nodatas, loading}) => {
       render: (text, record)=>{
         return (
           <span>
-            <Button type="primary" size="small" href="#">修改</Button>
+            <Button type="primary" size="small" onClick={()=>{
+              setFormValues(record);
+              handleUpdateModalVisible(true)
+            }}>修改</Button>
             <Divider type={'vertical'}/>
-            <Button type="primary" size="small" href="#">克隆</Button>
+            <Button type="primary" size="small" onClick={()=>{
+              setCloneFormValues(record);
+              handleCloneModalVisible(true)
+            }}>克隆</Button>
             <Divider type={'vertical'}/>
-            <Button type="primary" danger size="small" href="#">删除</Button>
+            <Button type="primary" danger size="small" onClick={
+              async ()=>{
+                await handleDeleteNodata(record);
+                refresh();
+              }}>
+              删除
+            </Button>
           </span>
         )
       }
@@ -130,6 +191,16 @@ const NodataList = ({nodatas, loading}) => {
     <span>
       <Row gutter={[4, 4]}>
         <Col span={24}>
+          <Button
+            type="primary"
+            onClick={()=>{
+              handleCreateModalVisible(true)
+            }}
+            icon={<PlusOutlined />}
+            style={{marginRight: '4px'}}
+          >
+            新建
+          </Button>
           <Input
             placeholder="Input endpoint to search"
             prefix={<SearchOutlined />}
@@ -156,6 +227,65 @@ const NodataList = ({nodatas, loading}) => {
           />
         </Col>
       </Row>
+      {createModalVisible ? (
+        <CreateForm
+          onSubmit={async value => {
+            const success = await handleCreate(value);
+
+            if (success) {
+              handleCreateModalVisible(false);
+              refresh();
+            }
+          }}
+
+          onCancel={() => {
+            handleCreateModalVisible(false);
+          }}
+          modalVisible={createModalVisible}
+          values={{}}
+        />
+      ): null }
+
+      {cloneFormValues && Object.keys(cloneFormValues).length ? (
+        <CreateForm
+          onSubmit={async value => {
+            const success = await handleCreate(value);
+
+            if (success) {
+              handleCloneModalVisible(false);
+              setCloneFormValues({})
+              refresh();
+            }
+          }}
+
+          onCancel={() => {
+            handleCloneModalVisible(false);
+            setCloneFormValues({})
+          }}
+          modalVisible={cloneModalVisible}
+          values={cloneFormValues}
+        />
+      ) : null}
+      {formValues && Object.keys(formValues).length ? (
+        <UpdateForm
+          onSubmit={async value => {
+            const success = await handleUpdate(value);
+
+            if (success) {
+              handleUpdateModalVisible(false);
+              setFormValues({});
+              refresh();
+            }
+          }}
+
+          onCancel={() => {
+            handleUpdateModalVisible(false);
+            setFormValues({});
+          }}
+          updateModalVisible={updateModalVisible}
+          values={formValues}
+        />
+      ) : null}
     </span>
   )
 };

@@ -8,12 +8,16 @@ export default {
   },
 
   effects: {
-    *queryNodatas({}, { call, put }) {
+    *queryNodatas({callback}, { call, put }) {
       const response = yield call(queryNodatas);
       yield put({
         type: '_queryNodatas',
         payload: response,
       })
+
+      if (callback){
+        callback()
+      }
     },
   },
 

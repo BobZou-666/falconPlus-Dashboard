@@ -10,12 +10,15 @@ export default {
   },
 
   effects: {
-    *queryEventCases(_, { call, put }) {
+    *queryEventCases({callback}, { call, put }) {
       const response = yield call(queryEventCases);
       yield put({
         type: '_queryEventCases',
         payload: response,
       })
+      if (callback){
+        callback()
+      }
     },
     *queryEventCaseById({payload, callback}, { call, put }) {
       const response = yield call(queryEventCaseById, payload);

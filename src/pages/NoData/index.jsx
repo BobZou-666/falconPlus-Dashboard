@@ -19,8 +19,7 @@ class Nodata extends React.Component {
     const { dispatch } = this.props;
     dispatch({
       type: 'nodata/queryNodatas',
-    }).then(()=>{
-      this.setState({loading:false});
+      callback: ()=>{this.setState({loading:false})}
     });
   };
 
@@ -35,6 +34,7 @@ class Nodata extends React.Component {
           <NodataList
             nodatas={Nodatas}
             loading={loading}
+            refresh={this.loadNodatas}
           />
         </Card>
       </PageHeaderWrapper>

@@ -20,14 +20,13 @@ class Alarm extends React.Component {
     const { dispatch } = this.props;
     dispatch({
       type: 'alarm/queryEventCases',
-    }).then(()=>{
-      this.setState({loading:false});
+      callback: ()=>{this.setState({loading:false})}
     });
   };
 
   render() {
     const {EventCases} = this.props;
-    const {loading, refreshInterval} = this.state;
+    const {loading} = this.state;
 
     let recoveredEventCases = [];
     let notRecoveredEventCases = [];
