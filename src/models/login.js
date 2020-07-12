@@ -1,6 +1,6 @@
 import { stringify } from 'querystring';
 import { router } from 'umi';
-import { fakeAccountLogin, AccountLogin } from '@/services/login';
+import { AccountLogout, AccountLogin } from '@/services/login';
 import { setAuthority, setApiToken } from '@/utils/authority';
 import { getPageQuery } from '@/utils/utils';
 const Model = {
@@ -41,12 +41,12 @@ const Model = {
       }
     },
 
-    logout() {
+    *logout({}, { call, put }) {
       const { redirect } = getPageQuery(); // Note: There may be security issues, please note
-
-      if (window.location.pathname !== '/user/login' && !redirect) {
+      yield call(AccountLogout);
+      if (window.location.pathname !== '/login' && !redirect) {
         router.replace({
-          pathname: '/user/login',
+          pathname: '/login',
           search: stringify({
             redirect: window.location.href,
           }),

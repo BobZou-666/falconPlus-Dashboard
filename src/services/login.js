@@ -13,6 +13,12 @@ export async function AccountLogin(params) {
   });
 }
 
+export async function AccountLogout() {
+  return request('/api/v1/user/logout', {
+    method: 'GET'
+  });
+}
+
 export async function getFakeCaptcha(mobile) {
   return request(`/api/login/captcha?mobile=${mobile}`);
 }

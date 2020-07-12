@@ -15,11 +15,18 @@ const UserModel = {
     },
 
     *fetchCurrent(_, { call, put }) {
-      const response = yield call(queryCurrent);
-      yield put({
-        type: 'saveCurrentUser',
-        payload: response,
-      });
+      let response = undefined
+      try {
+        response = yield call(queryCurrent);
+      } catch (e) {
+        return false
+      } finally {
+        yield put({
+          type: 'saveCurrentUser',
+          payload: response,
+        });
+      }
+      return true
     },
   },
   reducers: {

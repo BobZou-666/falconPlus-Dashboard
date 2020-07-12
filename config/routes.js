@@ -1,11 +1,11 @@
 export default [
   {
-    path: '/user',
+    path: '/login',
     component: '../layouts/UserLayout',
     routes: [
       {
         name: 'login',
-        path: '/user/login',
+        path: '/login',
         component: './user/login',
       },
     ],
@@ -60,6 +60,18 @@ export default [
               {path: '/alarm', component: './Alarm'},
               {path: '/alarm/:caseId', component: './Alarm/Detail'},
             ],
+          },
+          {
+            path: '/team',
+            name: 'team',
+            authority: ['admin'],
+            component: './Team',
+          },
+          {
+            path: '/user',
+            name: 'user',
+            authority: ['admin'],
+            component: './user',
           },
           {
             component: './404',

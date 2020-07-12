@@ -4,6 +4,8 @@ export default {
   'menu.screen': 'Screen',
   'menu.hostgroup': 'HostGroup',
   'menu.template': 'Template',
+  'menu.team': 'Team',
+  'menu.user': 'User',
   'menu.expression': 'Expression',
   'menu.nodata': 'NoData',
   'menu.alarm': 'Alarm',
