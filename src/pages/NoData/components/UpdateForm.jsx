@@ -54,7 +54,7 @@ const UpdateForm = props => {
         form={form}
         initialValues={formVals}
       >
-        <Form.Item label="Id" name="id" rules={[{ required: true}]}>
+        <Form.Item label="Id" name="id" style={{ display: 'none' }} rules={[{ required: true}]}>
           <Input disabled={true} />
         </Form.Item>
         <Form.Item label="Name" name="name" rules={[{ required: true }]}>

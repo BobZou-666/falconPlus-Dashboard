@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { PageHeaderWrapper, PageLoading } from '@ant-design/pro-layout';
 import {
-  DeleteTwoTone,
-  EditOutlined,
-  DeleteOutlined,
+  ReloadOutlined,
   PlusOutlined,
   SearchOutlined,
-  QuestionCircleTwoTone,
 } from '@ant-design/icons';
 import { Button, Card, Col, Input, message, Popconfirm, Row, Typography, Drawer, List, Divider } from 'antd';
-import { deleteTeam, queryTeam } from './service';
+import { queryTeam, updateTeam, createTeam } from './service';
 import { queryUsers } from '@/pages/user/service'
+import TeamCard from '@/pages/Team/components/TeamCard';
+import TeamUserList from '@/pages/Team/components/TeamUserList';
+import NotAddedUserList  from '@/pages/Team/components/UserList';
+import UpdateTeamForm from '@/pages/Team/components/UpdateForm';
+import CreateTeamForm from '@/pages/Team/components/CreateForm';
+
 
 const { Text } = Typography;
 
@@ -32,17 +35,31 @@ const queryUserList = async () =>{
   }
 }
 
-const handleDeleteTeam = async team => {
-  const hide = message.loading(`正在删除 ${team.name}`);
+const handleEditTeam = async payload => {
+  const hide = message.loading('正在更新');
   try {
-    await deleteTeam(team.id);
+    await updateTeam(payload);
     hide();
     message.success('更新成功');
-    return true
+    return true;
   } catch (error) {
     hide();
     message.error(`更新失败, 请重试：${error.toString()}`);
-    return false
+    return false;
+  }
+}
+
+const handleCreateTeam = async payload => {
+  const hide = message.loading('正在创建');
+  try {
+    await createTeam(payload);
+    hide();
+    message.success('创建成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error(`创建失败, 请重试：${error.toString()}`);
+    return false;
   }
 }
 
@@ -54,17 +71,52 @@ const searchInputStyle = {
 class Team extends React.Component{
   state={
     selectedTeam: undefined,
+    editedTeam: undefined,
     teams: undefined,
     allUsers: [],
     searchText: undefined,
     drawerVisible: false,
     childrenDrawerVisible: false,
+    updateFormVisible: false,
+    createFormVisible: false,
   }
 
   componentDidMount() {
+    this.loadTeams();
+  }
+
+  loadTeams = () => {
     queryTeamList().then(r=>{
       this.setState({teams: r})
     })
+  }
+
+  showCreateForm = () => {
+    this.setState({createFormVisible: true})
+  }
+
+  onCreateFormClose = () => {
+    this.setState({createFormVisible: false})
+  }
+
+  showUpdateForm = team =>{
+    this.setState({
+      editedTeam: team,
+    }, ()=>{
+      this.setState({
+        updateFormVisible: true,
+      });
+    });
+  }
+
+  onUpdateFormClose = () =>{
+    this.setState({
+      updateFormVisible: false,
+    }, ()=>{
+      this.setState({
+        editedTeam: undefined,
+      });
+    });
   }
 
   showDrawer = team => {
@@ -106,15 +158,21 @@ class Team extends React.Component{
   };
 
   setSearchText = e => {
-    this.setState({searchText: e.target.value}, ()=>{
-      queryTeamList().then(r=>{
-        this.setState({teams: r})
-      })
-    })
+    this.setState({searchText: e.target.value});
   }
 
   render() {
-    const {searchText, teams, drawerVisible, childrenDrawerVisible, selectedTeam, allUsers} = this.state;
+    const {
+      searchText,
+      teams,
+      drawerVisible,
+      childrenDrawerVisible,
+      selectedTeam,
+      editedTeam,
+      updateFormVisible,
+      createFormVisible,
+      allUsers
+    } = this.state;
     if (!teams){
       return <PageLoading/>
     }
@@ -150,9 +208,10 @@ class Team extends React.Component{
       <PageHeaderWrapper>
         <Card>
           <Row>
+            <span style={{width:'100%'}}>
             <Button
               type="primary"
-              onClick={()=>{}}
+              onClick={()=>{this.showCreateForm()}}
               icon={<PlusOutlined />}
               style={{marginRight: '4px'}}
             >
@@ -164,75 +223,64 @@ class Team extends React.Component{
               onChange={e => this.setSearchText(e)}
               style={searchInputStyle}
             />
+            <Button
+              type="default"
+              onClick={this.loadTeams}
+              icon={<ReloadOutlined />}
+              style={{float: 'right'}}
+            >
+              刷新
+            </Button>
+              </span>
           </Row>
           <Row gutter={[4,4]}>
             {
               filterTeams.map((v, i)=>{
-                // console.log(v, i)
                 return (
                   <Col span={6} key={i}>
-                    <Card
-                      size={'small'}
-                      onClick={()=>{this.showDrawer(v)}}
-                      hoverable
-                    >
-                      <Card.Meta
-                        title={
-                          <span>
-                            {v.team.name}(<Text type="warning">{v.users.length}</Text>)
-                            <span style={{float: 'right'}}>
-                              <Popconfirm
-                                icon={<QuestionCircleTwoTone twoToneColor="red"/>}
-                                title={<span>确定删除 <Text strong type="danger">{v.team.name}</Text> 吗?</span>}
-                                onConfirm={e=>{
-                                  e.stopPropagation();
-                                  handleDeleteTeam(v.team).then(r => {
-                                    if (r){
-                                      queryTeamList().then(r=>{
-                                        this.setState({teams: r})
-                                      })
-                                    }
-                                  });
-                                }}
-                                onCancel={e=>{e.stopPropagation();this.onDrawerClose()}}
-                                okText="删除"
-                                okButtonProps={{danger: true}}
-                                cancelText="取消"
-                              >
-                              <Button
-                                size="small"
-                                shape="circle"
-                                type="primary"
-                                danger
-                                icon={ <DeleteOutlined/>}
-                                onClick={e=>e.stopPropagation()}
-                              />
-                            </Popconfirm>
-                            <Divider type="vertical"/>
-                            <Button
-                              size="small"
-                              shape="circle"
-                              type="primary"
-                              icon={ <EditOutlined/>}
-                              onClick={e=>e.stopPropagation()}
-                            />
-                            </span>
-                          </span>
-                        }
-                        description={<Text ellipsis>{v.team.resume}</Text>}
-                      />
-                    </Card>
+                    <TeamCard
+                      showEditedForm={this.showUpdateForm}
+                      showDrawer={this.showDrawer}
+                      onDrawerClose={this.onDrawerClose}
+                      refresh={this.loadTeams}
+                      team={v}
+                    />
                   </Col>
                 )
               })
             }
           </Row>
+          <CreateTeamForm
+            onSubmit={async value => {
+              const success = await handleCreateTeam(value);
+              if (success) {
+                this.onCreateFormClose();
+                this.loadTeams();
+              }
+            }}
+            onClose={this.onCreateFormClose}
+            visible={createFormVisible}
+          />s
+          {editedTeam ? (
+            <UpdateTeamForm
+              values={editedTeam}
+              onSubmit={async value => {
+                const success = await handleEditTeam(value);
+                if (success) {
+                  this.onUpdateFormClose();
+                  this.loadTeams();
+                }
+              }}
+              visible={updateFormVisible}
+              onClose={this.onUpdateFormClose}
+            />
+          ):null}
           {selectedTeam ?
             (
               <Drawer
                 title={
                   <span>
-                    {selectedTeam.team.name}: <Text type="warning">{selectedTeam.users.length} 个用户</Text>
+                    {selectedTeam.team.name} (<Text type="warning">{selectedTeam.users.length} 个用户)</Text>
                     <Button style={{float: 'right'}} type="primary" size="small" onClick={this.showChildrenDrawer}>添加用户</Button>
                   </span>
                 }
@@ -241,53 +289,50 @@ class Team extends React.Component{
                 onClose={this.onDrawerClose}
                 visible={drawerVisible}
               >
-                <List
-                  size="small"
-                  pagination={{
-                    size: 'small',
-                    defaultPageSize: 10
+                <TeamUserList
+                  team={selectedTeam}
+                  onSubmit={async value => {
+                    const success = await handleEditTeam(value);
+                    if (success) {
+                      queryTeamList().then(r=>{
+                        this.setState({teams: r});
+                        r.every(v=>{
+                          if (v.team.id === value.team_id){
+                            this.setState({selectedTeam: v});
+                            return false;
+                          }
+                          return true;
+                        })
+                      })
+                    }
                   }}
-                  itemLayout="horizontal"
-                  dataSource={selectedTeam.users}
-                  renderItem={item => (
-                    <List.Item actions={[
-                      <Button type="primary" size="small" danger>
-                        移除
-                      </Button>
-                    ]}>
-                      <List.Item.Meta
-                        title={<span><Text strong><font color="green">{item.cnname}</font></Text> (<Text type={'secondary'}>{item.name}</Text>)</span>}
-                      />
-                    </List.Item>
-                  )}
                 />
                 {allUsers?(
                   <Drawer
-                    title="用户列表"
+                    title={<span>未添加用户 (<Text type="warning">{notAddUsers.length} 个用户)</Text></span>}
                     width={380}
                     closable={false}
                     onClose={this.onChildrenDrawerClose}
                     visible={childrenDrawerVisible}
                   >
-                    <List
-                      size="small"
-                      pagination={{
-                        size: 'small',
-                        defaultPageSize: 10
+                    <NotAddedUserList
+                      team={selectedTeam}
+                      notAddedUsers={notAddUsers}
+                      onSubmit={async value => {
+                        const success = await handleEditTeam(value);
+                        if (success) {
+                          queryTeamList().then(r=>{
+                            this.setState({teams: r});
+                            r.every(v=>{
+                              if (v.team.id === value.team_id){
+                                this.setState({selectedTeam: v});
+                                return false;
+                              }
+                              return true;
+                            })
+                          })
+                        }
                       }}
-                      itemLayout="horizontal"
-                      dataSource={notAddUsers}
-                      renderItem={item => (
-                        <List.Item actions={[
-                          <Button type="primary" size="small">
-                            添加
-                          </Button>
-                        ]}>
-                          <List.Item.Meta
-                            title={<span><Text strong><font color="green">{item.cnname}</font></Text> (<Text type={'secondary'}>{item.name}</Text>)</span>}
-                          />
-                        </List.Item>
-                      )}
                     />
                   </Drawer>
                 ):null}

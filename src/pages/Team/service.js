@@ -11,3 +11,17 @@ export async function deleteTeam(teamID) {
     method: 'DELETE',
   });
 }
+
+export async function updateTeam(payload) {
+  return request(`/api/v1/team`, {
+    method: 'PUT',
+    data: payload,
+  });
+}
+
+export async function createTeam(payload) {
+  return request(`/api/v1/team`, {
+    method: 'POST',
+    data: payload,
+  });
+}
