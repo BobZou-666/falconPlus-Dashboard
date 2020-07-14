@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Button, Form, Divider, message, Table, Typography, Row, Col, Input, Tag, Switch, Popconfirm } from 'antd';
 import { PlusOutlined, QuestionCircleTwoTone, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { changeUserRole, deleteUser, updateUserInfo, createUser } from '@/pages/user/service';
+import { changeUserRole, deleteUser, updateUserInfo, createUser, changeUserPassword } from '@/pages/user/service';
 import UpdateUserForm from '@/pages/user/components/UpdateForm'
+import ChangePasswordForm from '@/pages/user/components/ChangePasswordForm'
 import CreateUserForm from '@/pages/user/components/CreateForm'
 
 const { Text } = Typography;
@@ -25,6 +26,20 @@ const handleUpdateUserInfo = async (user, payload) => {
   let hide = message.loading(`正在更新: ${user.cnname}`);
   try {
     await updateUserInfo(user.id, payload);
+    hide();
+    message.success('更新成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error(`更新失败，请重试：${error.toString()}`);
+    return false;
+  }
+}
+
+const handleChangeUserPassword = async (username, payload) => {
+  let hide = message.loading(`正在更新: ${username}`);
+  try {
+    await changeUserPassword(payload);
     hide();
     message.success('更新成功');
     return true;
@@ -77,6 +92,7 @@ const UserList = props => {
   const {users, refresh} = props;
   const [searchText, setSearchText] = useState(undefined);
   const [updateVisible, setUpdateVisible] = useState(false);
+  const [changePasswordVisible, setChangePasswordVisible] = useState(false);
   const [createVisible, setCreateVisible] = useState(false);
   const [editUser, setEditUser] = useState(undefined);
 
@@ -184,7 +200,10 @@ const UserList = props => {
               setUpdateVisible(true);
             }}>修改</Button>
             <Divider type={'vertical'}/>
-            <Button type="primary" size="small" onClick={()=>{}}>修改密码</Button>
+            <Button type="primary" size="small" onClick={()=>{
+              setEditUser(record);
+              setChangePasswordVisible(true);
+            }}>修改密码</Button>
             <Divider type={'vertical'}/>
             <Popconfirm
               icon={<QuestionCircleTwoTone twoToneColor="red"/>}
@@ -257,6 +276,23 @@ const UserList = props => {
         }}
         visible={createVisible}
       />
+      {editUser?(
+        <ChangePasswordForm
+          onSubmit={async fields=>{
+            let success = await handleChangeUserPassword(editUser.cnname, fields);
+            if (success){
+              setChangePasswordVisible(false);
+              setEditUser(undefined);
+              refresh();
+            }}}
+          onClose={()=>{
+            setChangePasswordVisible(false);
+            setEditUser(undefined);
+          }}
+          userID={editUser.id}
+          visible={changePasswordVisible}
+        />
+      ):null}
       {editUser?(
         <UpdateUserForm
           onSubmit={async fields=>{

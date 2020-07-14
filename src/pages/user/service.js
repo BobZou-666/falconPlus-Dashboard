@@ -27,6 +27,13 @@ export async function changeUserRole(payload) {
   });
 }
 
+export async function changeUserPassword(payload) {
+  return request(`/api/v1/admin/change_user_passwd`, {
+    method: 'PUT',
+    data: payload,
+  });
+}
+
 export async function deleteUser(payload) {
   return request(`/api/v1/admin/delete_user`, {
     method: 'DELETE',
