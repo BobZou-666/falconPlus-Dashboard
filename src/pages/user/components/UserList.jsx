@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Button, Form, Divider, message, Table, Typography, Row, Col, Input, Tag, Switch, Popconfirm } from 'antd';
 import { PlusOutlined, QuestionCircleTwoTone, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
-import { changeUserRole, deleteUser, updateUserInfo } from '@/pages/user/service';
+import { changeUserRole, deleteUser, updateUserInfo, createUser } from '@/pages/user/service';
 import UpdateUserForm from '@/pages/user/components/UpdateForm'
+import CreateUserForm from '@/pages/user/components/CreateForm'
 
 const { Text } = Typography;
 
@@ -30,6 +31,20 @@ const handleUpdateUserInfo = async (user, payload) => {
   } catch (error) {
     hide();
     message.error(`更新失败，请重试：${error.toString()}`);
+    return false;
+  }
+}
+
+const handleCreateUser = async payload => {
+  let hide = message.loading(`正在创建: ${payload.cnname}`);
+  try {
+    await createUser(payload);
+    hide();
+    message.success('创建成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error(`创建失败，请重试：${error.toString()}`);
     return false;
   }
 }
@@ -62,6 +77,7 @@ const UserList = props => {
   const {users, refresh} = props;
   const [searchText, setSearchText] = useState(undefined);
   const [updateVisible, setUpdateVisible] = useState(false);
+  const [createVisible, setCreateVisible] = useState(false);
   const [editUser, setEditUser] = useState(undefined);
 
   let FilterSearchUsers = [];
@@ -197,7 +213,7 @@ const UserList = props => {
         <Col span={24}>
           <Button
             type="primary"
-            onClick={()=>{}}
+            onClick={()=>{setCreateVisible(true)}}
             icon={<PlusOutlined />}
             style={{marginRight: '4px', marginBottom: '4px' }}
           >
@@ -229,6 +245,18 @@ const UserList = props => {
           />
         </Col>
       </Row>
+      <CreateUserForm
+        onSubmit={async fields=>{
+          let success = await handleCreateUser(fields);
+          if (success){
+            refresh();
+            setCreateVisible(false);
+          }}}
+        onClose={()=>{
+          setCreateVisible(false);
+        }}
+        visible={createVisible}
+      />
       {editUser?(
         <UpdateUserForm
           onSubmit={async fields=>{

@@ -13,6 +13,13 @@ export async function updateUserInfo(id, payload) {
   });
 }
 
+export async function createUser(payload) {
+  return request(`/api/v1/user/create`, {
+    method: 'POST',
+    data: payload,
+  });
+}
+
 export async function changeUserRole(payload) {
   return request(`/api/v1/admin/change_user_role`, {
     method: 'PUT',

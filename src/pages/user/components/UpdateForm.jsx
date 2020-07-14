@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Form, Input, Modal, Select } from 'antd';
-import TextArea from 'antd/es/input/TextArea';
 
 const formLayout = {
   labelCol: { span: 4 },

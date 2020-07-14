@@ -29,7 +29,7 @@ class User extends React.Component {
   }
 
   render() {
-    const {users} = this.state;
+    const {users, createVisible} = this.state;
 
     return (
       <PageHeaderWrapper>
