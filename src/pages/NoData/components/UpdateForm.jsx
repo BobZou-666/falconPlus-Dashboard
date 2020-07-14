@@ -32,7 +32,6 @@ const UpdateForm = props => {
     setFormVals(fieldsValue);
     handleUpdate(fieldsValue);
     form.resetFields()
-    // setFormVals({});
   };
 
   return (

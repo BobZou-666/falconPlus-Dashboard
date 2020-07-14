@@ -208,30 +208,30 @@ class Team extends React.Component{
       <PageHeaderWrapper>
         <Card>
           <Row>
-            <span style={{width:'100%'}}>
-            <Button
-              type="primary"
-              onClick={()=>{this.showCreateForm()}}
-              icon={<PlusOutlined />}
-              style={{marginRight: '4px'}}
-            >
-              新建
-            </Button>
-            <Input
-              placeholder="input to search"
-              prefix={<SearchOutlined />}
-              onChange={e => this.setSearchText(e)}
-              style={searchInputStyle}
-            />
-            <Button
-              type="default"
-              onClick={this.loadTeams}
-              icon={<ReloadOutlined />}
-              style={{float: 'right'}}
-            >
-              刷新
-            </Button>
-              </span>
+            <Col span={24}>
+              <Button
+                type="primary"
+                onClick={()=>{this.showCreateForm()}}
+                icon={<PlusOutlined />}
+                style={{marginRight: '4px'}}
+              >
+                新建
+              </Button>
+              <Input
+                placeholder="input to search"
+                prefix={<SearchOutlined />}
+                onChange={e => this.setSearchText(e)}
+                style={searchInputStyle}
+              />
+              <Button
+                type="default"
+                onClick={this.loadTeams}
+                icon={<ReloadOutlined />}
+                style={{float: 'right'}}
+              >
+                刷新
+              </Button>
+            </Col>
           </Row>
           <Row gutter={[4,4]}>
             {
