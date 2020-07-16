@@ -1,48 +1,34 @@
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Menu, Spin } from 'antd';
 import React from 'react';
 import { connect } from 'dva';
-import { router } from 'umi';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 
 class AvatarDropdown extends React.Component {
-  onMenuClick = event => {
-    const { key } = event;
-
-    if (key === 'logout') {
-      const { dispatch } = this.props;
-
-      if (dispatch) {
-        dispatch({
-          type: 'login/logout',
-        });
-      }
-
-      return;
+  logout = () =>{
+    const { dispatch } = this.props;
+    if (dispatch) {
+      dispatch({
+        type: 'login/logout',
+      });
     }
-
-    router.push(`/account/${key}`);
-  };
+  }
 
   render() {
     const {
       currentUser = {
-        avatar: '',
         name: '',
       },
-      menu,
     } = this.props;
     const menuHeaderDropdown = (
-      <Menu className={styles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
-        <Menu.Item key="center">
-          <UserOutlined />
-          个人中心
+      <Menu className={styles.menu} selectedKeys={[]}>
+        <Menu.Item key="profile">
+          <a href={'/account/profile'}><UserOutlined /> 个人中心</a>
         </Menu.Item>
         <Menu.Divider />
         <Menu.Item key="logout">
-          <LogoutOutlined />
-          退出登录
+          <a onClick={()=>this.logout()}><LogoutOutlined /> 退出登录</a>
         </Menu.Item>
       </Menu>
     );

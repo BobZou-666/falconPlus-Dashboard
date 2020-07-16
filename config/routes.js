@@ -24,6 +24,10 @@ export default [
             redirect: '/dashboard',
           },
           {
+            path: '/account/profile',
+            component: './user/detail',
+          },
+          {
             path: '/dashboard',
             name: 'dashboard',
             component: './Dashboard',
